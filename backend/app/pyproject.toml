@@ -1,0 +1,9 @@
+[project]
+name = "app"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard]>=0.142.3",
+    "strawberry-graphql[fastapi]>=0.332.0",
+    "uvicorn>=0.54.0",
+]
