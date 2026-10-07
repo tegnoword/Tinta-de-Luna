@@ -1,39 +1,45 @@
 # Tinta de Luna 🌙
 
+**Tinta de Luna** es una aplicación íntima y exclusiva diseñada para redactar, guardar y enviar poemas en formato de carta especial directamente a WhatsApp.
+
+---
+
+## 📌 Diagrama de Flujo y Arquitectura
+
 ```mermaid
 flowchart TD
     %% Nodos de la Interfaz (Frontend)
-    subgraph UI [Frontend - Interfaz de Usuario]
-        A[Lista de Poemas / Home] -->|Crear / Editar| B[Editor de Poemas]
-        B -->|Clic en Guardar| C{¿Título único?}
-        B -->|Clic en Enviar| D[Vista Previa de la Carta]
+    subgraph UI ["Frontend - Interfaz de Usuario"]
+        A["Lista de Poemas / Home"] -->|"Crear / Editar"| B["Editor de Poemas"]
+        B -->|"Clic en Guardar"| C{"¿Título único?"}
+        B -->|"Clic en Enviar"| D["Vista Previa de la Carta"]
     end
 
     %% Nodos de la Base de Datos (SQLite / MySQL)
-    subgraph DB [Base de Datos - Tabla poem]
-        E[(DB: poem)]
+    subgraph DB ["Base de Datos - Tabla poem"]
+        E[("(DB: poem)")]
     end
 
     %% Nodos de Lógica e Integración
-    subgraph Logic [Lógica & Servicios]
-        F[Carta Helper / Formateador]
-        G[URL Encoder & Deep Link Service]
+    subgraph Logic ["Lógica & Servicios"]
+        F["Carta Helper / Formateador"]
+        G["URL Encoder & Deep Link Service"]
     end
 
     %% App Externa
-    subgraph External [App Externa]
-        H[WhatsApp Client]
+    subgraph External ["App Externa"]
+        H["WhatsApp Client"]
     end
 
     %% Conexiones e Interacciones
-    C -->|Sí| E
-    C -->|No: Error Unique| B
-    E -->|Carga poemas| A
+    C -->|"Sí"| E
+    C -->|"No: Error Unique"| B
+    E -->|"Carga poemas"| A
     
-    D -->|Envía poema| F
-    F -->|Aplica negritas, emojis y marcos| G
-    G -->|Actualiza status = 'sent'| E
-    G -->|Abre [https://wa.me/](https://wa.me/)...| H
+    D -->|"Envía poema"| F
+    F -->|"Aplica negritas, emojis y marcos"| G
+    G -->|"Actualiza status = 'sent'"| E
+    G -->|"Abre [https://wa.me/](https://wa.me/)..."| H
 
     %% Estilos
     classDef ui fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
@@ -45,4 +51,4 @@ flowchart TD
     class E db;
     class F,G logic;
     class H ext;
-```
+    
