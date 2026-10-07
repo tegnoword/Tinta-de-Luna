@@ -1,6 +1,6 @@
-# Tinta de Luna
+# Tinta de Luna 🌙
 
-```
+```mermaid
 flowchart TD
     %% Nodos de la Interfaz (Frontend)
     subgraph UI [Frontend - Interfaz de Usuario]
@@ -15,7 +15,7 @@ flowchart TD
     end
 
     %% Nodos de Lógica e Integración
-    subgraph Logic [Logica & Servicios]
+    subgraph Logic [Lógica & Servicios]
         F[Carta Helper / Formateador]
         G[URL Encoder & Deep Link Service]
     end
@@ -33,7 +33,7 @@ flowchart TD
     D -->|Envía poema| F
     F -->|Aplica negritas, emojis y marcos| G
     G -->|Actualiza status = 'sent'| E
-    G -->|Abre https://wa.me/...| H
+    G -->|Abre [https://wa.me/](https://wa.me/)...| H
 
     %% Estilos
     classDef ui fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
