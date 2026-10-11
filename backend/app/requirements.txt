@@ -1,3 +1,5 @@
 uvicorn
 fastapi[standard]
 strawberry-graphql[fastapi]
+psycopg[binary]
+python-dotenv
