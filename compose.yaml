@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: mi_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: mi_usuario
+      POSTGRES_PASSWORD: mi_password
+      POSTGRES_DB: mi_base_datos
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - luna-network
+
+  backend:
+    build: .
+    container_name: backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=postgres
+      - PORT=5432
+      - POSTGRES_DB=mi_base_datos
+      - POSTGRES_USERNAME=mi_usuario
+      - POSTGRES_PASSWORD=mi_password
+    depends_on:
+      - postgres
+    networks:
+      - luna-network
+
+volumes:
+  pgdata:
+
+networks:
+  luna-network:
+    driver: bridge
