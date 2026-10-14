@@ -8,4 +8,5 @@ config = {
     "POSTGRES_PASSWORD": os.getenv("POSTGRES_PASSWORD"),
     "POSTGRES_DB": os.getenv("POSTGRES_DB"),
     "PORT": os.getenv("PORT"), 
+    "POSTGRES_HOST": os.getenv("POSTGRES_HOST")
 }

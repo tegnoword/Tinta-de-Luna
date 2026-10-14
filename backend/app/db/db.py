@@ -6,7 +6,7 @@ from psycopg.rows import dict_row
 def get_db_connection():
     """Establece la conexión a PostgreSQL, asegura que la tabla exista y retorna la conexión."""
     conn = psycopg.connect(
-        host="localhost",
+        host=config.config["POSTGRES_HOST"],
         port=config.config["PORT"],
         dbname=config.config["POSTGRES_DB"],
         user=config.config["POSTGRES_USERNAME"],
