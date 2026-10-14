@@ -1,0 +1,7 @@
+backend/app/venv/*
+backend/app/__pycache__/*
+backend/app/model/__pycache__/*
+backend/app/uv.lock
+app
+
+.env
