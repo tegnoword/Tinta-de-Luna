@@ -6,11 +6,11 @@ from psycopg.rows import dict_row
 def get_db_connection():
     """Establece la conexión a PostgreSQL, asegura que la tabla exista y retorna la conexión."""
     conn = psycopg.connect(
-        host=config.config["POSTGRES_HOST"],
-        port=config.config["PORT"],
-        dbname=config.config["POSTGRES_DB"],
-        user=config.config["POSTGRES_USERNAME"],
-        password=config.config["POSTGRES_PASSWORD"],
+        host=config.config.get("POSTGRES_HOST", "postgres"),  # Valor por defecto si no se encuentra la variable de entorno
+        port=config.config.get("PORT"),
+        dbname=config.config.get("POSTGRES_DB"),
+        user=config.config.get("POSTGRES_USERNAME"),
+        password=config.config.get("POSTGRES_PASSWORD"),
         row_factory=dict_row  # Permite recibir los resultados como diccionarios
     )
 
