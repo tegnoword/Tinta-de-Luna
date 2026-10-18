@@ -5,7 +5,7 @@ from psycopg.rows import dict_row
 
 def get_db_connection():
 
-    db_host = config.config.get("POSTGRES_HOST")
+    db_host = config.config.get("POSTGRES_HOST")  # Valor por defecto si no se encuentra la variable de entorno
     db_port = config.config.get("POSTGRES_PORT")
     db_name = config.config.get("POSTGRES_DB")
     db_user = config.config.get("POSTGRES_USERNAME")
@@ -21,7 +21,6 @@ def get_db_connection():
     )
 
     with conn.cursor() as cur:            
-        cur.execute("ALTER TABLE poem ALTER COLUMN creation_day SET DEFAULT CURRENT_TIME;")
         cur.execute("""
             CREATE TABLE IF NOT EXISTS poem (
                 id_poem SERIAL PRIMARY KEY,
@@ -31,6 +30,9 @@ def get_db_connection():
                 creation_day TIME DEFAULT NULL
             );
         """)
+     
+        cur.execute("ALTER TABLE poem ALTER COLUMN creation_day SET DEFAULT CURRENT_TIME;")
+     
         conn.commit()
         
     return conn

@@ -30,5 +30,5 @@ COPY backend/app/ .
 # Exponemos el puerto de FastAPI
 EXPOSE 8000
 
-# Comando para iniciar el servidor
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Comando para ejecutar la aplicación FastAPI usando uvicorn
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port 8000"]
