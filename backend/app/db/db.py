@@ -1,24 +1,34 @@
+import os
 from config import config
 import psycopg
 from psycopg.rows import dict_row
 
 
 def get_db_connection():
+    # Si Render proporciona una URL completa de conexión (DATABASE_URL), se usa directamente.
+    database_url = os.getenv("DATABASE_URL")
+    
+    if database_url:
+        conn = psycopg.connect(
+            database_url,
+            row_factory=dict_row
+        )
+    else:
+        # Configuración tradicional mediante variables individuales (ideal para Docker Compose local)
+        db_host = config.config.get("POSTGRES_HOST")
+        db_port = config.config.get("POSTGRES_PORT")
+        db_name = config.config.get("POSTGRES_DB")
+        db_user = config.config.get("POSTGRES_USERNAME")
+        db_password = config.config.get("POSTGRES_PASSWORD")
 
-    db_host = config.config.get("POSTGRES_HOST")  # Valor por defecto si no se encuentra la variable de entorno
-    db_port = config.config.get("POSTGRES_PORT")
-    db_name = config.config.get("POSTGRES_DB")
-    db_user = config.config.get("POSTGRES_USERNAME")
-    db_password = config.config.get("POSTGRES_PASSWORD")
-
-    conn = psycopg.connect(
-        host=db_host,  # Valor por defecto si no se encuentra la variable de entorno
-        port=db_port,
-        dbname=db_name,
-        user=db_user,
-        password=db_password,
-        row_factory=dict_row  # Permite recibir los resultados como diccionarios
-    )
+        conn = psycopg.connect(
+            host=db_host,
+            port=db_port,
+            dbname=db_name,
+            user=db_user,
+            password=db_password,
+            row_factory=dict_row
+        )
 
     with conn.cursor() as cur:            
         cur.execute("""
@@ -102,4 +112,4 @@ def delete_poem_db(id_poem: int):
             )
             deleted_poem = cur.fetchone()
             conn.commit()
-            return deleted_poem is not None        
+            return deleted_poem is not None
