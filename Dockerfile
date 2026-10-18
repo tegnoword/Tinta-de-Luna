@@ -31,4 +31,4 @@ COPY backend/app/ .
 EXPOSE 8000
 
 # Comando para ejecutar la aplicación FastAPI usando uvicorn
-CMD ["sh", -c, "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
