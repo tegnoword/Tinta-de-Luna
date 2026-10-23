@@ -1,7 +1,22 @@
-backend/app/venv/*
-backend/app/__pycache__/*
-backend/app/model/__pycache__/*
+# Python / Backend
+backend/app/venv/
+backend/app/__pycache__/
+backend/app/model/__pycache__/
 backend/app/uv.lock
-app
 
+# Flutter & Android (App Móvil)
+app/build/
+app/.dart_tool/
+app/.packages
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+
+# Ignorar cualquier otro build global
+build/
+.gradle/
+
+# Logs y entorno local
+*.log
+logs.sh
+logs.txt
 .env
