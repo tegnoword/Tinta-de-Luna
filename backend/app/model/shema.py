@@ -130,6 +130,34 @@ class Mutation:
         )
 
     @strawberry.field
+    def update_poem_status(self, id_poem: int, status: str) -> typing.Optional[PoemType]:
+        """Actualiza únicamente el estado de un poema (ej. draft a sent)"""
+        with get_db_connection() as conn:
+            with conn.cursor(row_factory=dict_row) as cur:
+                cur.execute(
+                    """
+                    UPDATE poem 
+                    SET status = %s 
+                    WHERE id_poem = %s 
+                    RETURNING id_poem, title, text_poem, status, creation_day;
+                    """,
+                    (status, id_poem)
+                )
+                row = cur.fetchone()
+                conn.commit()
+        
+        if not row:
+            return None
+            
+        return PoemType(
+            id_poem=row["id_poem"],
+            title=row["title"],
+            text_poem=row["text_poem"],
+            status=row["status"],
+            creation_day=row["creation_day"]
+        )
+
+    @strawberry.field
     def delete_poem(self, id_poem: int) -> bool:
         """Elimina un poema por su ID"""
         with get_db_connection() as conn:
