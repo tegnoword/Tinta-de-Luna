@@ -28,7 +28,8 @@ class PoemInput:
 class PoemUpdateInput:
     id_poem: int
     title: str
-    text_poem: str    
+    text_poem: str
+    status: typing.Optional[str] = None  # Añadido para permitir actualizar el estado
 
 
 @strawberry.type
@@ -103,45 +104,20 @@ class Mutation:
     
     @strawberry.field
     def update_poem(self, input: PoemUpdateInput) -> typing.Optional[PoemType]:
-        """Actualiza el título y texto completo de un poema"""
+        """Actualiza el título, texto y opcionalmente el estado de un poema"""
         with get_db_connection() as conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                # Usamos COALESCE para que si 'status' viene nulo, mantenga el valor que ya tenía en la BD
                 cur.execute(
                     """
                     UPDATE poem 
-                    SET title = %s, text_poem = %s 
+                    SET title = %s, 
+                        text_poem = %s, 
+                        status = COALESCE(%s, status)
                     WHERE id_poem = %s 
                     RETURNING id_poem, title, text_poem, status, creation_day;
                     """,
-                    (input.title, input.text_poem, input.id_poem)
-                )
-                row = cur.fetchone()
-                conn.commit()
-        
-        if not row:
-            return None
-            
-        return PoemType(
-            id_poem=row["id_poem"],
-            title=row["title"],
-            text_poem=row["text_poem"],
-            status=row["status"],
-            creation_day=row["creation_day"]
-        )
-
-    @strawberry.field
-    def update_poem_status(self, id_poem: int, status: str) -> typing.Optional[PoemType]:
-        """Actualiza únicamente el estado de un poema (ej. draft a sent)"""
-        with get_db_connection() as conn:
-            with conn.cursor(row_factory=dict_row) as cur:
-                cur.execute(
-                    """
-                    UPDATE poem 
-                    SET status = %s 
-                    WHERE id_poem = %s 
-                    RETURNING id_poem, title, text_poem, status, creation_day;
-                    """,
-                    (status, id_poem)
+                    (input.title, input.text_poem, input.status, input.id_poem)
                 )
                 row = cur.fetchone()
                 conn.commit()
