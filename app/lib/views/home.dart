@@ -5,9 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core/theme/colors.dart';
 import '../models/model_poem.dart';
 import '../services/services.dart';
-import '../widgets/card.dart';
 import '../widgets/bar.dart';
-import 'edict.dart'; // <--- Importamos el Taller de Escritura
+import '../widgets/card.dart';
+import 'edict.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -119,6 +119,7 @@ class _HomeViewState extends State<HomeView> {
                     options: QueryOptions(
                       document: gql(GraphQLService.fetchPoemsQuery),
                       pollInterval: const Duration(seconds: 10),
+                      fetchPolicy: FetchPolicy.cacheAndNetwork,
                     ),
                     builder:
                         (
@@ -143,7 +144,7 @@ class _HomeViewState extends State<HomeView> {
                             );
                           }
 
-                          if (result.isLoading) {
+                          if (result.isLoading && result.data == null) {
                             return const Center(
                               child: CircularProgressIndicator(
                                 color: AppColors.primaryContainer,
@@ -178,6 +179,7 @@ class _HomeViewState extends State<HomeView> {
                             );
                           }
 
+                          // Envolvemos con las mutaciones necesarias para borrar y actualizar estado
                           return Mutation(
                             options: MutationOptions(
                               document: gql(GraphQLService.deletePoemMutation),
@@ -185,52 +187,75 @@ class _HomeViewState extends State<HomeView> {
                                 if (refetch != null) refetch();
                               },
                             ),
-                            builder:
-                                (
-                                  RunMutation runDeleteMutation,
-                                  QueryResult? deleteResult,
-                                ) {
-                                  return ListView.builder(
-                                    padding: const EdgeInsets.only(
-                                      bottom: 100,
-                                      top: 8,
-                                    ),
-                                    itemCount: poems.length,
-                                    itemBuilder: (context, index) {
-                                      final poem = poems[index];
-                                      return PoemCard(
-                                        poem: poem,
-                                        onTap: () async {
-                                          // Abrir el Editor cargando el poema seleccionado
-                                          final result = await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => EditorView(
-                                                idPoem: poem.idPoem,
-                                                initialTitle: poem.title,
-                                                initialText: poem.textPoem,
-                                              ),
-                                            ),
-                                          );
-                                          if (result == true &&
-                                              refetch != null) {
-                                            refetch();
-                                          }
-                                        },
-                                        onWhatsAppTap: () {
-                                          _openWhatsApp(poem.whatsappLink);
-                                        },
-                                        onDeleteTap: () {
-                                          _showDeleteDialog(
-                                            context,
-                                            poem.idPoem,
-                                            runDeleteMutation,
+                            builder: (RunMutation runDeleteMutation, _) {
+                              return Mutation(
+                                options: MutationOptions(
+                                  document: gql(
+                                    GraphQLService.updatePoemStatusMutation,
+                                  ),
+                                  onCompleted: (data) {
+                                    // Forzamos la recarga inmediata de la query para refrescar la UI
+                                    if (refetch != null) refetch();
+                                  },
+                                ),
+                                builder:
+                                    (RunMutation runUpdateStatusMutation, _) {
+                                      return ListView.builder(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 100,
+                                          top: 8,
+                                        ),
+                                        itemCount: poems.length,
+                                        itemBuilder: (context, index) {
+                                          final poem = poems[index];
+                                          return PoemCard(
+                                            poem: poem,
+                                            onTap: () async {
+                                              final navResult =
+                                                  await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          EditorView(
+                                                            idPoem: poem.idPoem,
+                                                            initialTitle:
+                                                                poem.title,
+                                                            initialText:
+                                                                poem.textPoem,
+                                                          ),
+                                                    ),
+                                                  );
+                                              if (navResult == true &&
+                                                  refetch != null) {
+                                                refetch();
+                                              }
+                                            },
+                                            onWhatsAppTap: () {
+                                              // 1. Actualizamos el estado enviando el input completo requerido por el backend
+                                              runUpdateStatusMutation({
+                                                'input': {
+                                                  'idPoem': poem.idPoem,
+                                                  'title': poem.title,
+                                                  'textPoem': poem.textPoem,
+                                                  'status': 'sent',
+                                                },
+                                              });
+                                              // 2. Abrimos WhatsApp
+                                              _openWhatsApp(poem.whatsappLink);
+                                            },
+                                            onDeleteTap: () {
+                                              _showDeleteDialog(
+                                                context,
+                                                poem.idPoem,
+                                                runDeleteMutation,
+                                              );
+                                            },
                                           );
                                         },
                                       );
                                     },
-                                  );
-                                },
+                              );
+                            },
                           );
                         },
                   ),
@@ -238,7 +263,7 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
 
-            // Navigation Bar Flotante (Rudder)
+            // Navigation Bar Flotante
             Positioned(
               left: 0,
               right: 0,
@@ -246,13 +271,10 @@ class _HomeViewState extends State<HomeView> {
               child: RudderBar(
                 onHomeTap: () {},
                 onAddTap: () async {
-                  // Navegar al Taller de Escritura para un nuevo poema
-                  final result = await Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const EditorView()),
                   );
-                  // Nota: Como estamos dentro del widget Query, si tienes acceso a refetch puedes usarlo,
-                  // o el pollInterval actualizará la lista en breve.
                 },
                 onProfileTap: () {},
               ),

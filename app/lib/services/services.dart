@@ -15,24 +15,36 @@ class GraphQLService {
 
   // --- QUERIES ---
   static const String fetchPoemsQuery = """
-    query {
+    query FetchPoems(\$phoneNumber: String) {
       getPoems {
         idPoem
         title
         textPoem
         status
         creationDay
-        whatsappLink(phoneNumber: "584121234567") 
+        whatsappLink(phoneNumber: \$phoneNumber)
       }
     }
   """;
 
   // --- MUTACIONES ---
   static const String createPoemMutation = """
-    mutation CreatePoem(\$title: String!, \$textPoem: String!) {
-      createPoem(title: \$title, textPoem: \$textPoem) {
+    mutation CreatePoem(\$input: PoemInput!) {
+      createPoem(input: \$input) {
         idPoem
         title
+        textPoem
+        status
+        creationDay
+      }
+    }
+  """;
+
+  // Mutación adaptada para usar PoemUpdateInput en el backend
+  static const String updatePoemStatusMutation = """
+    mutation UpdatePoemStatus(\$input: PoemUpdateInput!) {
+      updatePoem(input: \$input) {
+        idPoem
         status
       }
     }

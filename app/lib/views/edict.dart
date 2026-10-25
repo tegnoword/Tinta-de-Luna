@@ -114,7 +114,14 @@ class _EditorViewState extends State<EditorView> {
                             return;
                           }
 
-                          runMutation({'title': title, 'textPoem': textPoem});
+                          // CORRECCIÓN: Envuelto en 'input' para cumplir con PoemInput!
+                          runMutation({
+                            'input': {
+                              'title': title,
+                              'textPoem': textPoem,
+                              'status': 'draft',
+                            },
+                          });
                         },
                   child: isLoading
                       ? const SizedBox(
