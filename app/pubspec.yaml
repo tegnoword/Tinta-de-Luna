@@ -53,7 +53,7 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
   # see https://flutter.dev/to/font-from-package
 flutter_launcher_icons:
-    image_path: "assets/icon/logo.png" # La ruta y nombre de tu imagen
+    image_path: "assets/icon/logo_two.png" # La ruta y nombre de tu imagen
     android: true
     ios: true
 
